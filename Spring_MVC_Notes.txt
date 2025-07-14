@@ -1,0 +1,267 @@
+What is Spring MVC?
+Spring MVC is a web framework built around the MVC design pattern, which separates concerns into three components:
+
+
+
+
+Component	          Role	                                     Spring Implementation
+
+Model	                Holds data and business logic	             Java objects, often populated via Model,
+                                                                   ModelMap, or ModelAndView
+
+
+View	                Renders the UI	                         JSP, Thymeleaf, or other templating engines
+Controller	          Handles user input and updates model/view	 Annotated with @Controller and mapped using
+                                                                   @RequestMapping
+
+
+
+@Controller — The Request Handler
+Marks a class as a Spring MVC controller
+
+Spring scans and registers it as a bean
+
+Typically used with @RequestMapping to define request-handling methods
+
+
+@Controller
+public class HomeController {
+
+    @RequestMapping("/home")
+    public String homePage(Model model) {
+        model.addAttribute("message", "Welcome, Aniket!");
+        return "home"; // View name (e.g., home.jsp or home.html)
+    }
+}
+
+
+
+@RequestMapping — The Route Mapper
+Maps HTTP requests to handler methods
+
+Can be used at class level (for base path) and method level (for specific endpoints)
+
+@RequestMapping(value = "/greet", method = RequestMethod.GET)
+public String greet(Model model) {
+    model.addAttribute("greeting", "Hello from Spring MVC!");
+    return "greet";
+}
+
+
+
+
+@RequestParam — For Simple Query/Form Parameters
+Binds individual request parameters (like query strings or form fields) to method arguments.
+
+Works well for simple types: String, int, boolean, etc.
+
+@GetMapping("/search")
+public String search(@RequestParam("q") String query) {
+    // query = value from ?q=...
+    return "results";
+}
+@ModelAttribute — For Binding to Java Objects
+Binds all matching request parameters to a Java object (POJO).
+
+Ideal for form submissions or structured data.
+
+
+
+@PostMapping("/register")
+public String register(@ModelAttribute User user) {
+    // Automatically binds fields like user.name, user.email, etc.
+    return "welcome";
+}
+@ModelAttribute
+public void addCommonData(Model model) {
+    model.addAttribute("appName", "SpringApp");
+}
+
+
+In Spring MVC, ModelAndView is a container object that holds both the model data and the view name—allowing you 
+to return them together from a controller method. 
+It’s especially useful when you want to keep things explicit and bundled in one return value.
+
+
+
+What Is ModelAndView?
+Combines:
+
+Model: Data you want to pass to the view (like a Map<String, Object>)
+
+View: The name of the view (e.g., a JSP or Thymeleaf template)
+
+
+
+Model and @ModelAttribute
+
+
+Model — The Data Carrier
+It’s an interface used to pass data from the controller to the view.
+
+You use it to add attributes that the view (like a JSP or Thymeleaf template) can access.
+
+
+
+@GetMapping("/greet")
+public String greet(Model model) {
+    model.addAttribute("name", "Aniket");
+    return "greeting"; // View name
+}
+
+
+@ModelAttribute — The Data Binder
+It’s an annotation used to bind request parameters to a Java object.
+
+Can be used:
+
+On method parameters: to bind form data to a POJO
+
+On methods: to pre-populate model attributes before any handler runs
+
+
+
+@PostMapping("/register")
+public String register(@ModelAttribute User user) {
+    // Spring auto-populates 'user' fields from form data
+    return "welcome";
+}
+
+
+
+Feature	                    Model	                        @ModelAttribute
+Type	                          Interface	                        Annotation
+Purpose	                    Add data to be rendered in view	Bind request data to method parameters
+Used in	                    Controller methods	            Method parameters or methods
+Example usage	              model.addAttribute("x", val)	@ModelAttribute User user
+
+
+
+
+What is the role of the DispatcherServlet’s front controller role?
+Manage Http Request Centrally.
+
+
+In a Spring MVC application, what will happen if two @RequestMapping methods
+ in different controllers have the same URL pattern?
+
+Spring will throw a runtime exception during startup.
+
+
+What happens if a controller method returns null as the view name?
+Spring assumes the response has been handled directly by the controller method.
+
+
+How does Spring MVC decide which HTTP request headers to include in the response?
+Headers are controlled via HttpServletResponse or annotation like @ResponseHeader.
+
+Which of the following best describes the purpose of the HandlerInterceptor in Spring MVC?
+Providing pre and post processing for a request before they reach a controller.
+
+
+In Spring MVC, how does the @SessionAttributes annotation differ from HttpSession?
+@SessionAttribute is scoped to the controller,while HttpSession is global for the application.
+
+In Spring MVC, what is the primary difference between @RequestBody and @RequestParam?
+@RequestBody bind the HttpRequest bodies,while @RequestParam binds the query parameters or form data.
+
+In a Spring MVC configuration, what does the mvc:resources tag do?
+Configures static resources handling such as CSS,JS or images.
+
+How do you configure a custom error page in Spring MVC?
+use the <error-page> element in web.xml
+
+What is the purpose of the @PathVariable annotation in Spring MVC?
+To bind url template variable to method arguments.
+
+
+
+
+
+🧭 Overview of Each Annotation
+Annotation	      Purpose	                             HTTP Method	      Introduced In
+@RequestMapping	Generic mapping for any HTTP method	     Any	            Spring 2.5
+@GetMapping	S     hortcut for handling HTTP GET requests   GET	            Spring 4.3
+@PostMapping	Shortcut for handling HTTP POST requests POST	            Spring 4.3
+
+
+
+Detailed Differences
+@RequestMapping
+
+Can be used at both class and method levels.
+
+Requires specifying the HTTP method explicitly using method = RequestMethod.GET or RequestMethod.POST, etc.
+
+@RequestMapping(value = "/hello", method = RequestMethod.GET)
+public String sayHello() {
+    return "Hello!";
+}
+
+
+@GetMapping
+
+Specialized version of @RequestMapping for GET requests.
+
+Cleaner and more readable than @RequestMapping(method = RequestMethod.GET).
+
+Only applicable at the method level.
+
+@GetMapping("/hello")
+public String sayHello() {
+    return "Hello!";
+}
+@PostMapping
+
+Specialized version of @RequestMapping for POST requests.
+
+Used when you want to submit data (e.g., form submissions, JSON payloads).
+
+@PostMapping("/submit")
+public String submitData(@RequestBody Data data) {
+    return "Submitted!";
+}
+
+When to Use What
+Use @GetMapping when retrieving data (e.g., fetching user details).
+
+Use @PostMapping when sending data to the server (e.g., creating a new record).
+
+Use @RequestMapping when you need more flexibility or support for multiple HTTP methods.
+
+
+
+
+Functional Differences Between GET and POST
+Feature	                      GET	                        POST
+Purpose	                 Retrieve data from the server        Send data to the server to create/update resource
+Data Location	Appended to the URL as query parameters	      Sent in the request body
+Visibility	                 Visible in browser URL	            Hidden from URL
+Security	                 Less secure (data exposed in URL)	More secure (data not logged in URL)
+Data Size Limit	           Limited (URL length restrictions)	No practical limit
+Caching	                 Can be cached	                  Not cached
+Bookmarking	                 Can be bookmarked	                  Cannot be bookmarked
+Use Case Examples	           Search queries, fetching user profiles	Login forms, submitting orders, uploading files
+Idempotency	                 Yes (same request = same result)	No (can create multiple resources)
+
+
+
+
+When to Use Each
+Use GET when:
+
+You’re retrieving data.
+
+The request is safe and repeatable.
+
+You want the URL to be shareable or bookmarkable.
+
+Use POST when:
+
+You’re sending or modifying data.
+
+The request involves sensitive information.
+
+You need to upload files or submit forms.
+
+
