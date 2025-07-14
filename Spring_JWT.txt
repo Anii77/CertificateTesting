@@ -1,0 +1,82 @@
+What algorithm is commonly used to sign a JWT?
+HMAC-SHA256
+
+What type of information is typically stored in the payload of a JWT?
+Claims like user roles or expiration times.
+
+Which header parameter specifies the algorithm used to sign a JWT?
+alg
+
+What does the 'exp' claim in a JWT indicate?
+The expiration time of the JWT
+
+How can a JWT be verified on the server side?
+By comparing the signature using secret key
+
+Which claim is used to specify the issuer of a JWT?
+iss
+
+What is a key advantage of using JWT for authentication?
+it is lightweight and stateless
+
+
+What is the primary purpose of OAuth?
+Delegating access without sharing credentials.
+
+What is the typical expiration time of a JWT access token?
+Configurable by the server
+
+What is the purpose of the "refresh token" in OAuth?
+To extend the expiration time of an access token.
+
+In OAuth, who issues the access_token?
+Application Server
+
+Which HTTP method is commonly used to exchange an authorization code for an access token in OAuth?
+POST
+
+What is the purpose of the scope parameter in OAuth?
+To define the level of access requested.
+
+What does a JSON Web Token (JWT) consist of?
+Header,Payload and Signature.
+
+Which part of a JWT is used to verify that the token has not been tampered with?
+Signature
+
+
+Spring JWT (JSON Web Token) is a powerful way to implement stateless 
+authentication in Spring Boot applications—especially for REST APIs. 
+It allows you to securely transmit user identity and claims between client and server without relying on sessions.
+
+What Is JWT?
+A compact, URL-safe token used to represent claims between two parties.
+
+Consists of three parts:Header.Payload.Signature
+
+
+Spring JWT Authentication Flow
+User logs in with credentials.
+
+Server authenticates and generates a JWT.
+
+JWT is sent to the client (usually in response body or header).
+
+Client stores it (e.g., in localStorage).
+
+For future requests, client sends JWT in Authorization: Bearer <token> header.
+
+Server validates the token and grants access.
+
+
+
+
+Concept	            What to Understand	                                  Interview Tip
+What is JWT	            Token that stores claims in a compact format	           Explain Header, Payload, Signature structure
+Why JWT in REST	      Stateless authentication, scales better                    Mention mobile & microservices use cases
+                        than sessions	                           
+JWT Authentication Flow	Login → Token issue → Token sent in headers → Validation	Draw the flow if asked
+Spring JWT Implementation	JwtUtil, UserDetailsService, Filter chain	Just overview, not deep code
+SecurityFilterChain Usage	Replace WebSecurityConfigurerAdapter	Know basics of method
+Common Annotations	@PreAuthorize, @EnableMethodSecurity, @RequestHeader	Show your Spring Security awareness
+Token Expiry & Validation	Tokens should expire; validate signature	Know it's important for security hygiene
