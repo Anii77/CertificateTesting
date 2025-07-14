@@ -1,0 +1,127 @@
+Spring AOP (Aspect-Oriented Programming) is a powerful tool
+ for modularizing cross-cutting concerns—like logging, security, 
+or transaction management—without cluttering your core business logic.
+
+
+What Is AOP?
+AOP is a programming paradigm that allows you to inject behavior (called advice) 
+into existing code (called join points) without modifying the code itself. It’s like saying:
+
+“Run this extra logic before or after this method—without touching the method.”
+
+
+Core Concepts in Spring AOP
+Concept	                  Description
+Aspect	                  A module that encapsulates cross-cutting logic (e.g., logging, security)
+JoinPoint	                  A point during execution (usually method calls) where advice can be applied
+Advice	                  The actual action taken (e.g., before, after, around a method)
+Pointcut	                  A predicate that matches join points (e.g., all methods in a package)
+Weaving	                  Linking aspects with target objects (Spring does this at runtime via proxies)
+
+
+
+
+
+Types of Advice
+Advice Type	              When It Runs	                                Annotation
+@Before	              Before method execution	                    @Before
+@After	              After method execution (success or fail)	  @After
+@AfterReturning	        After method returns successfully	              @AfterReturning
+@AfterThrowing	        If method throws an exception	              @AfterThrowing
+@Around	              Before and after method execution	              @Around
+
+
+@Aspect
+@Component
+public class LoggingAspect {
+
+    @Before("execution(* com.example.service.*.*(..))")
+    public void logBefore(JoinPoint joinPoint) {
+        System.out.println("Calling: " + joinPoint.getSignature().getName());
+    }
+}
+This logs every method call in com.example.service before execution.
+
+
+
+
+@Before — Run before method execution
+
+@Aspect
+@Component
+public class LoggingAspect {
+
+    @Before("execution(* com.example.service.UserService.getUser(..))")
+    public void logBefore(JoinPoint joinPoint) {
+        System.out.println("Before: " + joinPoint.getSignature().getName());
+    }
+}
+Use case: Logging method entry, validating input, or starting timers.
+
+
+
+@After — Run after method execution (success or exception)
+@Aspect
+@Component
+public class LoggingAspect {
+
+    @After("execution(* com.example.service.UserService.getUser(..))")
+    public void logAfter(JoinPoint joinPoint) {
+        System.out.println("After: " + joinPoint.getSignature().getName());
+    }
+}
+Use case: Cleanup, releasing resources, or generic logging.
+
+
+
+@AfterReturning — Run after successful method execution
+
+@Aspect
+@Component
+public class LoggingAspect {
+
+    @AfterReturning(
+        pointcut = "execution(* com.example.service.UserService.getUser(..))",
+        returning = "result"
+    )
+    public void logAfterReturning(JoinPoint joinPoint, Object result) {
+        System.out.println("Returned: " + result);
+    }
+}
+Use case: Logging return values, auditing, or modifying response.
+
+
+
+@AfterThrowing — Run only if exception is thrown
+
+@Aspect
+@Component
+public class LoggingAspect {
+
+    @AfterThrowing(
+        pointcut = "execution(* com.example.service.UserService.getUser(..))",
+        throwing = "ex"
+    )
+    public void logException(JoinPoint joinPoint, Throwable ex) {
+        System.out.println("Exception in: " + joinPoint.getSignature().getName());
+        System.out.println("Error: " + ex.getMessage());
+    }
+}
+Use case: Error logging, alerting, or rollback triggers.
+
+
+
+@Around — Wraps method execution (before & after)
+@Aspect
+@Component
+public class LoggingAspect {
+
+    @Around("execution(* com.example.service.UserService.getUser(..))")
+    public Object logAround(ProceedingJoinPoint pjp) throws Throwable {
+        System.out.println("Before Around: " + pjp.getSignature().getName());
+        Object result = pjp.proceed(); // executes the method
+        System.out.println("After Around: " + pjp.getSignature().getName());
+        return result;
+    }
+}
+Use case: Performance monitoring, conditional execution, or retry logic.
