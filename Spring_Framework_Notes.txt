@@ -1,0 +1,443 @@
+The Spring Framework is a popular, open-source, Java-based framework
+that provides a comprehensive infrastructure for building enterprise-level applications.
+It simplifies the development process by offering features like dependency injection and 
+aspect-oriented programming, allowing developers to focus on application-specific logic 
+rather than low-level infrastructure. 
+
+IOC Container
+An IoC Container is a framework that manages the creation, configuration, and lifecycle of objects and their dependencies.
+
+🔄 Responsibilities:
+Instantiate classes
+Inject dependencies
+Manage object lifecycles (singleton, prototype, etc.)
+🛠️ Popular IoC Containers:
+Spring Framework (Java)
+.NET Core DI Container (C#)
+Guice (Google’s DI for Java)
+
+
+@Component
+class Engine {
+    void start() {
+        System.out.println("Engine started");
+    }
+}
+
+@Component
+class Car {
+    @Autowired
+    private Engine engine;
+
+    void drive() {
+        engine.start();
+        System.out.println("Car is moving");
+    }
+}
+Dependency Injection (DI)
+Dependency Injection is a design pattern used to implement Inversion of Control (IoC), allowing a class to receive its dependencies from an external source rather than creating them itself.
+
+✅ Benefits:
+Promotes loose coupling
+Improves testability
+Enhances code maintainability
+
+
+class Engine {
+    void start() {
+        System.out.println("Engine started");
+    }
+}
+
+class Car {
+    private Engine engine;
+
+    // Dependency is injected via constructor
+    public Car(Engine engine) {
+        this.engine = engine;
+    }
+
+    void drive() {
+        engine.start();
+        System.out.println("Car is moving");
+    }
+}
+In Spring, the IoC (Inversion of Control) container is a core component that manages the creation, configuration,
+and assembly of objects, also known as beans. 
+It facilitates Dependency Injection (DI), where the container provides dependencies to beans instead 
+of the beans managing their own dependencies. 
+This promotes loose coupling, making applications more flexible, maintainable, and testable. 
+Beans:
+Objects managed by the Spring IoC container. 
+
+
+
+🌱 Spring Framework
+Spring Framework is a comprehensive, modular framework for building Java applications. 
+It provides infrastructure support for developing Java apps, especially enterprise-level applications.
+Key Features:
+Core container for dependency injection
+Support for AOP (Aspect-Oriented Programming)
+Transaction management
+MVC web framework
+Integration with various data access technologies (JDBC, JPA, Hibernate)
+⚠️ Challenges:
+Requires a lot of configuration (XML or Java-based)
+Steeper learning curve
+Slower setup for new projects
+
+
+🚀 Spring Boot
+Spring Boot is a project built on top of the Spring Framework. It simplifies the setup and development of new Spring applications by providing defaults and auto-configuration.
+
+✅ Key Features:
+Auto-configuration: Reduces boilerplate configuration
+Embedded servers: Like Tomcat or Jetty, no need to deploy WAR files
+Production-ready: Includes metrics, health checks, and externalized configuration
+Starter dependencies: Simplifies dependency management
+⚡ Advantages:
+Rapid development
+Minimal configuration
+Ideal for microservices
+
+
+ 
+Feature	           Spring Framework	           Spring Boot
+Setup	                 Manual, verbose	           Auto-configured, fast
+Configuration	     XML or Java-based	           Convention over configuration
+Server	           External (e.g., Tomcat)	     Embedded (Tomcat, Jetty, etc.)
+Use Case	           Large, complex applications   Microservices, quick prototypes
+Learning Curve	     Steeper	                 Easier for beginners
+Deployment	           WAR	                       JAR
+
+
+
+
+@SpringBootApplication
+public class SpringBootDemo
+{
+public static void main(String[] args)
+{
+ApplicationContext context=SpringApplication.run(SpringBootDemoApplication.class,args)
+Alien obj=context.getBeans(Alien.class);
+Alien obj1 = context.getBean(Alien.class);
+obj.code();//coding
+obj1.code();//coding
+
+System.out.println(obj==obj1)//true
+}
+}
+
+@Component
+public class Alien
+{
+public void code()
+{
+System.out.println("Coding");
+}
+}
+
+
+What happens when you annotate a class with @Component?
+During application startup, Spring performs component scanning (usually in the base package and sub-packages).
+
+It detects the class marked with @Component and automatically registers it as a bean in the Spring ApplicationContext.
+
+Now, Spring is responsible for managing the lifecycle and dependencies of that class.
+
+
+
+🧱 Related Annotations:
+Spring also provides specialized versions of @Component for specific use cases:
+
+Annotation	Purpose
+@Controller	For web layer components
+@Service	For business logic services
+@Repository	For DAO/database access classes 	
+
+
+
+What is Autowiring?
+Autowiring allows Spring to automatically resolve and inject dependencies 
+into your beans—no need for you to manually write new or configure them in XML.
+
+
+How does it work?
+When a class (say, Alien) needs another bean (like Computer), you just declare the dependency with
+@Autowired, and Spring handles the rest.
+
+Example:
+@Component
+public class Alien {
+
+    @Autowired
+    private Computer computer;
+
+    public void code() {
+        computer.compile();
+    }
+}
+@Component
+public class Computer {
+    public void compile() {
+        System.out.println("Compiling...");
+    }
+}
+If there are multiple candidates, use @Qualifier("beanName") to tell Spring which one you want.
+
+
+
+What is the key principle of Inversion of Control (IoC)?
+The framework takes control of object creation and management.
+
+
+Which feature of Spring is used to separate cross-cutting concerns like logging?
+Aspect-Oriented Programming
+
+
+
+
+
+Scope	      Behavior
+Singleton	Only one instance of the bean is created per Spring container. It’s reused for every injection. (Default scope)
+Prototype	A new instance is created every time the bean is requested from the container.
+
+
+
+Singleton Scope:
+Efficient memory usage—only one object is maintained.
+
+Thread safety must be handled manually if shared ac
+
+
+Prototype Scope:
+Each injection gets a fresh instance.
+
+Spring does not manage the full lifecycle—destruction callbacks won’t be called automatically.
+
+
+
+XML
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+         http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- Singleton scoped bean (default) -->
+    <bean id="singletonBean" class="com.example.SingletonBean" />
+
+    <!-- Prototype scoped bean -->
+    <bean id="prototypeBean" class="com.example.PrototypeBean" scope="prototype" />
+
+</beans>
+
+
+
+
+
+Setter Dependency Injection
+
+public class Student {
+    private String name;
+    private int age;
+
+    // No-arg constructor
+    public Student() {}
+
+    // Setters for DI
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public void display() {
+        System.out.println("Name: " + name + ", Age: " + age);
+    }
+}
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+         http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="student" class="com.example.Student">
+        <property name="name" value="Aniket" />
+        <property name="age" value="25" />
+    </bean>
+
+</beans>
+ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
+Student student = (Student) context.getBean("student");
+student.display(); // Output: Name: Aniket, Age: 25
+
+
+
+
+public class Car {
+    private Engine engine; // property name is 'engine'
+    public void setEngine(Engine engine) { this.engine = engine; }
+}
+<bean id="engine" class="com.example.Engine"/>
+<bean id="car" class="com.example.Car" autowire="byName"/>
+✅ Spring sees the engine property in Car, finds a bean with ID engine, and injects it.
+
+❌ If the bean ID was mainEngine, this would fail unless you rename the property or bean.
+
+
+
+
+
+autowire="byType" — Match by Property Type
+Spring looks for a bean whose class matches the property type, regardless of the property name.
+
+public class Car {
+    private Engine engine;
+    public void setEngine(Engine engine) { this.engine = engine; }
+}
+<bean id="mainEngine" class="com.example.Engine"/>
+<bean id="car" class="com.example.Car" autowire="byType"/>
+
+
+Spring sees that Car needs an Engine, finds a bean of type Engine, and injects it—even though the ID is mainEngine.
+
+⚠️ But if there are two beans of type Engine, Spring throws an error unless you help it with @Qualifier.
+
+
+
+
+Feature	         byName	                        byType
+Matching Rule	   Bean ID == property name	      Bean type == property type
+Flexibility	         Less flexible	                  More flexible
+Risk	               Breaks if names don’t match	Breaks if multiple beans of same type
+Use Case	         When you control bean names	When you rely on types
+
+
+
+
+What Is Lazy Initialization?
+By default, Spring eagerly creates all singleton beans at application startup. But with lazy initialization, 
+the bean is created only when it’s first requested—saving memory and speeding up startup time.
+
+
+
+@Component
+@Lazy
+public class HeavyBean {
+    public HeavyBean() {
+        System.out.println("HeavyBean initialized!");
+    }
+}
+
+
+The @ConstructorProperties annotation in Spring allows Spring to:
+Map constructor parameters by their names.
+
+
+
+
+
+🥇 @Primary — “Default winner”
+Used on a bean definition
+
+Tells Spring: “If there’s a tie, pick me.”
+
+You don’t need to explicitly mention it at the injection point.
+
+
+@Bean
+@Primary
+public DataSource mysqlDataSource() { ... }
+@Autowired
+private DataSource dataSource;  // Injects mysqlDataSource automatically
+
+
+
+@Qualifier — “Exact match”
+Used at the injection point
+
+Tells Spring exactly which bean to inject
+
+Overrides @Primary if both are used
+
+@Autowired
+@Qualifier("postgresDataSource")
+private DataSource dataSource;  // Injects specifically the Postgres one
+
+
+
+
+
+
+Use Case	                   Annotation	     How It Helps
+You want a default bean	       @Primary	     Simplifies autowiring when no qualifier is given
+You want a specific bean	 @Qualifier	     Gives precise control when multiple options exist
+
+
+
+
+
+🧱 @Component — Defines a Spring-managed bean
+Applied to classes that should be automatically detected and instantiated.
+
+Commonly used for service classes, repositories, controllers, etc.
+
+
+@Component
+public class MyUtilityService { ... }
+👉 Spring will discover this class during component scanning and manage it as a bean.
+
+
+
+
+🗂️ @ComponentScan — Tells Spring where to look for @Component classes
+Used on a configuration class to specify the base packages to scan.
+
+
+@Configuration
+@ComponentScan(basePackages = "com.example.services")
+public class AppConfig { ... }
+👉 Without this, Spring might not detect @Component-annotated classes outside its default scope.
+
+
+@Configuration — Marks a class as a source of bean definitions
+It’s a specialized form of @Component, meaning Spring will also register it as a bean.
+
+Often used in Java-based configuration to define beans explicitly with @Bean.
+@Configuration
+public class DataSourceConfig {
+
+    @Bean
+    public DataSource dataSource() {
+        return new HikariDataSource(); // Your JDBC setup here
+    }
+}
+
+
+🔁 How They Work Together
+Annotation	       Purpose	                                   Typical Use Case
+@Component	       Mark classes to be discovered	           Services, utilities, custom repositories.
+@ComponentScan	 Tell Spring where to find @Component classes  Placed on config classes to direct scanning.
+@Configuration	 Define beans via @Bean methods	           Database, WebClient, or third-party 
+                                                                 integration config.
+
+
+What is the purpose of the @Configuration annotation in Spring?
+To mark class as a source of bean definations.
+
+What does AnnotationConfigApplicationContext do in Spring?
+It initalizes beans using annotations in a configuration class.
+
+Which autowiring method is most suitable for optional dependencies?
+Setter-based autowiring.
+
+What is the benefit of using constructor-based autowiring over field-level autowiring?
+It makes the class immutable and ensures dependencies are mandatory.
+
+
+
+
+
