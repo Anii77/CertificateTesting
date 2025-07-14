@@ -1,0 +1,152 @@
+What is the primary purpose of Spring Security?
+Securing Applications.
+
+What annotation is used to enable Spring Security in a Spring Boot application?
+@EnableWebSecurity
+
+By default, Spring Security secures all endpoints of a Spring Boot application:
+True
+
+Which class is commonly extended to customize Spring Security configuration before spring security 6?
+WebSecurityConfigureAdapter
+
+Which component is responsible for authenticating user credentials in Spring Security?
+Authentication Provider
+
+
+What is the default encryption algorithm used by Spring Security for passwords in Spring Boot 5+?
+BCrypt
+
+What is the purpose of @PreAuthorize in Spring Security?
+To define method level Security
+
+Which of these is used to configure role-based access control in Spring Security?
+hasRole('ROLE_NAME')
+
+
+What is the purpose of SecurityContextHolder in Spring Security?
+To Store authentication Details.
+
+Which interface in Spring Security defines the contract for user authentication?
+Authentication
+
+In Spring Security, how is a user authenticated by default?
+Using the UserDetailsService interface.
+
+What does the csrf() method in the Spring Security configuration do?
+Enable Cross-Site request Forgery protection.
+
+Which filter is responsible for handling username and password-based authentication in Spring Security?
+UsernamePasswordAuthenticationFilter
+
+What is the primary purpose of the BCryptPasswordEncoder in Spring Security?
+To hash Password Securely
+
+Which annotation is used to enable method-level security with Spring Security?
+@EnableMethodSecurity
+
+
+
+
+
+🔐 Core Concepts
+Concept	      Description
+Authentication	Verifies who the user is (e.g., login with username/password)
+Authorization	Determines what the user is allowed to do (e.g., access control by roles)
+Password Storage	Uses secure encoding strategies like BCrypt
+Security Filters	Intercepts requests to enforce security rules
+
+
+Spring Boot will auto-configure basic security (form login + CSRF protection).
+You can override it with a custom SecurityFilterChain:
+
+@Bean
+public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/admin/**").hasRole("ADMIN")
+            .anyRequest().authenticated()
+        )
+        .formLogin(withDefaults());
+    return http.build();
+}
+@PreAuthorize("hasRole('ADMIN')")
+public void deleteUser(Long id) { ... }
+
+
+
+Method-Level Security
+Secure service methods using annotations:
+
+@PreAuthorize("hasRole('ADMIN')")
+
+@PostAuthorize, @Secured, @RolesAllowed
+Enable with:@EnableMethodSecurity
+
+Custom UserDetailsService
+Load user credentials from DB or external systems.
+
+Implement UserDetailsService and override loadUserByUsername.
+@Service
+public class CustomUserDetailsService implements UserDetailsService {
+    public UserDetails loadUserByUsername(String username) {
+        // Fetch user, roles, and return UserDetails
+    }
+}
+
+
+SecurityFilterChain Customization
+Replace deprecated WebSecurityConfigurerAdapter.
+
+Use SecurityFilterChain bean to configure HTTP security.
+@Bean
+public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    http
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/admin/**").hasRole("ADMIN")
+            .anyRequest().authenticated()
+        )
+        .formLogin(withDefaults());
+    return http.build();
+}
+
+
+CSRF, CORS, and Session Management
+CSRF: Enabled by default for form-based apps.
+
+CORS: Configure for cross-origin requests in REST APIs.
+
+Session: Control with sessionManagement() for stateless or stateful flows.
+
+
+OAuth2 and OpenID Connect
+Integrate with Google, GitHub, Okta, etc.
+
+Use spring-boot-starter-oauth2-client for login flows.
+
+Customize with OAuth2UserService for role mapping.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
