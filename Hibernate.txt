@@ -1,0 +1,201 @@
+Hibernate is a Java-based ORM tool that automates the mapping between:
+
+Java classes ↔ Database tables
+
+Java objects ↔ SQL rows
+
+It lets you interact with the DB using Java objects, not SQL queries — and handles all CRUD operations under the hood.
+
+
+🔍 What’s Fetching in Hibernate?
+When you have relationships (like @OneToMany, @ManyToOne, etc.),
+fetching defines when the related entity/data should be loaded:
+
+EAGER Fetching  @OneToMany(fetch = FetchType.EAGER)
+
+What it does:
+Loads the related entity immediately along with the parent.
+
+Always joins or fires an additional query when the parent is fetched.
+
+
+
+Hibernate Query Language
+//   Select * from laptop where ram=32 ->SQL
+//        from Laptop where ram=32 -> HQL
+
+
+        Query query = session.createQuery("from Laptop where ram=32");
+        List<Laptop> laptops = query.getResultList();
+        System.out.println(laptops);
+
+
+ Query query = session.createQuery("select brand, model from Laptop where brand like ?1");
+        query.setParameter(1, brand);
+ List<Object[]> laptops = query.getResultList();
+
+        for (Object[] data : laptops) {
+            System.out.println((String) data[0] + " : " + (String) data[1]);
+        }
+
+
+@Entity
+class Student {
+    @OneToMany(fetch = FetchType.EAGER)
+    private List<Book> books;
+}
+So if you fetch a Student, Hibernate also fetches all Books automatically, even if you don’t access getBooks().
+
+Caution:
+Can lead to performance issues (N+1 queries or big join result sets)
+
+Not good if you rarely use the child collection
+
+
+LAZY Fetching (Default for Collections)
+@OneToMany(fetch = FetchType.LAZY)
+
+
+
+What it does:
+Loads the related entity only when accessed via getter.
+
+Returns a proxy object initially — the real query fires only when needed.
+
+Student student = session.find(Student.class, 1); // does NOT fetch books
+List<Book> books = student.getBooks(); // Triggers query here
+
+Benefits:
+Improves performance when child data isn't always needed
+
+Lets you control what gets loaded and when
+Pitfall:
+If session is already closed when you access a lazy field, you'll hit:
+
+> ❌ LazyInitializationException
+
+
+
+
+
+Feature 	    EAGER	                            LAZY
+Load timing	    Immediate	                      On-demand
+Default for	    @ManyToOne / @OneToOne	          @OneToMany / @ManyToMany
+Performance	    Slower if unused data is fetched	    Faster but needs caution
+Exception risk  None	                            Needs open session
+
+
+
+get() — Loads eagerly:
+Student s = session.get(Student.class, 101);
+if (s != null) {
+    System.out.println(s.getSname()); // Already fetched
+}
+load() — Returns a proxy:
+Student s = session.load(Student.class, 101); // No query yet!
+System.out.println(s.getSname()); // Triggers DB fetch here
+If student with ID 101 doesn’t exist, get() returns null, while load() 
+throws an exception when the proxy tries to hit the DB.
+
+
+
+
+get()	      Immediately returns the actual object or null if not found
+load()	Immediately returns a proxy object. Hits the DB only when needed
+
+
+
+Student s = session.get(Student.class, 101);  // 🔁 SQL query runs NOW
+System.out.println(s.getSname());             // ✅ Already loaded
+
+
+Student s = session.load(Student.class, 101); // ❌ No SQL yet!
+System.out.println(s.getSname());             // 🔁 SQL runs HERE
+
+
+
+
+Hibernate Caching Levels Overview:
+Level  	Scope	                          Used For	             Default?
+L1	      Per Session	                    Entity, Collections	 Always enabled
+L2	      Per SessionFactory (shared)	  Entities, Collections, You Enabled it
+
+
+What is Level 2 Cache?
+Level 2 cache is a shared cache across sessions — it stores entities, collections, or even query results so that future sessions avoid re-hitting the database.
+
+Cached between sessions
+
+Improves performance on repeated reads
+
+Requires a cache provider (like Ehcache, Infinispan, Caffeine)
+
+
+
+How to Enable Level 2 Cache
+1. Add a Caching Provider (Example: Ehcache 3)
+
+
+In pom.xml:
+<dependency>
+  <groupId>org.ehcache</groupId>
+  <artifactId>ehcache</artifactId>
+  <version>3.10.8</version>
+</dependency>
+
+
+@Entity
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+public class Student {
+    @Id
+    private int rollNo;
+    private String sname;
+    private int age;
+}
+
+
+
+What uniqueResult() Does
+It’s used with Query or TypedQuery when your HQL or criteria query returns exactly one row.
+
+Query<Student> query = session.createQuery("from Student where rollNo = :roll", Student.class);
+query.setParameter("roll", 18);
+
+Student s = query.uniqueResult(); // ✅ returns a single Student object
+
+
+
+
+
+Case	                   What uniqueResult() returns
+One result	             ✅ Returns the object
+No result	             ✅ Returns null
+More than one result	 ❌ Throws NonUniqueResultException
+
+
+
+
+Why might an initial attempt to save data in Hibernate fail?
+Incorrect table columns mapping or missing transaction.
+
+What is required for a successful data save using Hibernate?
+Beginning and committing the transaction.
+
+Refactoring in Hibernate refers to the process of improving the structure 
+and readability of your Hibernate code without changing its functionality. 
+This can involve several practices, such as:
+Renaming Entities and Properties
+Optimizing Queries
+Improving Annotations
+
+
+
+Which method is used to fetch data in Hibernate?
+session.get() or session.load()
+
+Which method fetches data using HQL?
+session.createQuery()
+
+
+  
