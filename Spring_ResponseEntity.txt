@@ -1,0 +1,58 @@
+ResponseEntity<T> in Spring is your go-to class for crafting 
+custom HTTP responses—including status codes, headers, and body. 
+It’s perfect for REST APIs where you want full control over what the server sends back to the client.
+
+✅ 200 OK — Success
+return ResponseEntity.ok("Request successful");
+Used when everything goes well.
+
+Default for most GET operations.
+
+
+
+🆕 201 Created — Resource Created
+URI location = URI.create("/users/42");
+return ResponseEntity.created(location).body("User created");
+deal for POST requests that create new resources.
+
+Includes a Location header pointing to the new resource.
+
+
+204 No Content — Success, No Body
+return ResponseEntity.noContent().build();
+Used when the operation succeeds but there’s nothing to return.
+
+Common for DELETE or PUT operations.
+
+⚠️ 400 Bad Request — Client Error
+return ResponseEntity.badRequest().body("Invalid input");
+Used when the client sends malformed or invalid data.
+
+
+
+401 Unauthorized — Auth Required
+return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login required");
+ndicates missing or invalid authentication.
+
+
+403 Forbidden — Access Denied
+return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied");
+Authentication is valid, but the user lacks permission.
+
+
+❌ 404 Not Found — Resource Missing	
+return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+Used when the requested resource doesn’t exist.
+
+405 Method Not Allowed
+return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body("Use POST instead");
+
+
+💥 500 Internal Server Error — Server Crash
+return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong");
+Indicates an unexpected error on the server side.
+
+
+🛑 503 Service Unavailable — Server Overloaded
+return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body("Try again later");
+Used when the server is temporarily unable to handle the request.

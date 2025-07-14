@@ -1,0 +1,115 @@
+Maven is a Project Management Tools which is used to manage the dependencies.
+
+It streamlines the process of building, testing, and deploying software by automating tasks like
+dependency management, compiling code, and creating project documentation.
+
+
+
+Maven uses XML for project configuration and follows a strict lifecycle, 
+making it suitable for smaller projects or those prioritizing stability.
+
+
+Gradle offers more flexibility through its Groovy-based build scripts, 
+enabling customization and supporting multiple languages, making it a good fit for larger
+and more complex projects. 
+
+
+
+groupId
+What it is: Represents the unique domain or organization that owns the project.
+
+Think of it like: A namespace (similar to Java packages).
+
+Convention: Uses reverse domain notation.
+<groupId>com.aniket.framework</groupId>
+
+
+📘 artifactId
+What it is: The actual name of the project or module you're building.
+
+This becomes the JAR/war name: artifactId-version.jar
+
+Should be unique within a groupId.
+<artifactId>test-utils</artifactId>
+
+
+
+🔢 version
+What it is: The specific version of your build.
+
+Helps manage versions during development and deployment.
+
+Often follows MAJOR.MINOR.PATCH, or includes -SNAPSHOT for dev versions.
+
+<version>1.0.0</version>
+
+
+What is the Effective POM?
+> The Effective POM is the merged, fully-resolved version of your pom.xml, including:
+
+Your project’s own pom.xml
+
+Inherited settings from parent POMs (like spring-boot-starter-parent)
+
+Configuration from profiles
+
+Default values from Super POM
+
+
+
+🏗️ What is a Maven Archetype?
+A Maven archetype is a template for generating new projects. Think of it as a starter kit that gives you:
+
+Predefined folder structure (src/main/java, resources, test)
+
+Sample pom.xml
+
+Sample Java classes, config files, test stubs
+
+
+groupId: project namespace
+
+artifactId: project folder name + final JAR name
+
+archetypeArtifactId: tells Maven which template to use (quickstart = Java project with tests)
+
+
+Popular Built-in Archetypes
+Archetype	                     Purpose
+maven-archetype-quickstart	   Simple Java application template
+maven-archetype-webapp	         Basic web application structure
+maven-archetype-j2ee-simple	   Java EE sample project
+maven-archetype-site	         Generates Maven site structure
+
+
+In Maven, What is the default scope?
+compile
+
+
+Which of the following elements in the pom.xml file specifies the project's group identifier?
+<groupId>
+
+
+In Maven, what is a transitive dependency?
+Dependencies that are dependencies of your direct dependencies.
+
+
+What is the full form of POM? ->Project Object Model
+
+What does the <dependency> element represent in a Maven project configuration?
+
+A project's dependency on external libraries.
+
+
+
+
+
+
+
+
+
+
+
+
+
+

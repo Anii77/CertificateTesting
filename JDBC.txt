@@ -1,0 +1,154 @@
+Steps for JDBC
+
+
+1)Import Packages
+2)Load Driver          Class.forName("com.mysql.cj.jdbc.Driver");  // Optional since JDBC 4+
+
+3)Register Driver      
+
+4)Create Connection    Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+
+5)Create Statement     Statement stmt = conn.createStatement();
+6)Execute Statement    ResultSet rs = stmt.executeQuery("SELECT * FROM books");
+                       while(rs.next()) { System.out.println(rs.getString("title")); }
+
+7)Close
+
+
+
+What is the correct order of steps in JDBC programming?
+Load Driver ->Establish Connection ->Create Statement ->Execute Query ->Closed Connection.
+
+
+What does ResultSet in JDBC represent?
+A table of data representing the result of a query.
+
+
+Why is using Statement in JDBC considered risky?
+It is vulnerable to SQL injection attacks.
+
+What is the main benefit of using PreparedStatement over Statement?
+It prevents SQL injection and improves performance.
+
+
+📥 4. PreparedStatement vs Statement
+Use PreparedStatement for:
+
+Safer (avoids SQL injection)
+
+Reusable queries
+
+Better performance (precompiled)
+
+
+PreparedStatement ps = conn.prepareStatement("SELECT * FROM books WHERE author = ?");
+ps.setString(1, "Aniket");
+
+
+String query = "SELECT * FROM books WHERE author LIKE ?";
+ps.setString(1, "%" + inputAuthor + "%");
+
+
+while (rs.next()) {
+    int id = rs.getInt("id");
+    String name = rs.getString("title");
+}
+
+Batch processing...
+
+ List<Book> bookList = Arrays.asList(
+            new Book("Effective Java", "Joshua Bloch"),
+            new Book("Clean Code", "Robert C. Martin"),
+            new Book("Design Patterns", "Erich Gamma")
+        );
+
+        String insertQuery = "INSERT INTO books (title, author) VALUES (?, ?)";
+
+        try (Connection conn = DriverManager.getConnection(url, user, password);
+             PreparedStatement ps = conn.prepareStatement(insertQuery)) {
+
+            for (Book b : bookList) {
+                ps.setString(1, b.getTitle());
+                ps.setString(2, b.getAuthor());
+                ps.addBatch(); // Add to batch
+            }
+
+            int[] result = ps.executeBatch(); // Execute all at once
+            System.out.println("Rows inserted: " + Arrays.stream(result).sum());
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
+
+
+🔄 What is Connection Pooling?
+Each time your app connects to a database, it opens a new TCP connection, authenticates, and allocates memory — an expensive process. Connection pooling solves this by:
+
+Creating a pool of ready-to-use connections at startup
+
+Letting you borrow and reuse connections instead of creating new ones each time
+
+It drastically reduces latency and resource usage 
+
+
+
+
+
+HikariCP — High-Performance Connection Pool
+HikariDataSource ds = new HikariDataSource();  ->This line is your gateway to using HikariCP,
+                                              the fastest and most lightweight JDBC connection pool available.
+
+It is:
+
+Production-ready
+
+Used by Spring Boot under the hood
+
+Highly configurable and thread-safe
+
+
+
+
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+
+public class HikariExample {
+    public static void main(String[] args) {
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl("jdbc:mysql://localhost:3306/library");
+        config.setUsername("root");
+        config.setPassword("password");
+        config.setMaximumPoolSize(10);   // Max active connections
+        config.setIdleTimeout(30000);    // Time before releasing idle connections
+
+        HikariDataSource ds = new HikariDataSource(config);
+
+        try (Connection conn = ds.getConnection();
+             PreparedStatement ps = conn.prepareStatement("SELECT * FROM books")) {
+
+            ps.executeQuery().close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            ds.close();  // Shuts down the pool gracefully
+        }
+    }
+}
+config.setMaximumPoolSize(10);
+What it does: Sets the maximum number of connections that can be open in the pool at the same time.
+
+
+config.setIdleTimeout(30000); (in milliseconds)
+🔍 What it does: Closes idle connections after 30 seconds (i.e. 30,000 ms) if they're not currently in use.
+
+🎯 Why it matters:
+
+Saves resources when your app is "resting"
+
+Keeps the pool elastic (shrinks down under low load)
