@@ -1,0 +1,62 @@
+Spring Data REST is a powerful extension of the 
+Spring Data project that lets you automatically expose your Spring Data repositories as 
+RESTful web services—without writing any controller code. 
+It’s perfect for quickly building CRUD APIs over your domain models .
+
+
+
+What It Does
+Automatically creates REST endpoints for your JPA entities
+
+Supports CRUD operations, pagination, sorting, and search
+
+Follows HATEOAS principles (Hypermedia as the Engine of Application State)
+
+Uses HAL format for linking resources.
+
+
+How It Works
+
+1)
+You define your JPA entity:
+
+@Entity
+public class Student {
+    @Id
+    @GeneratedValue
+    private Long id;
+    private String name;
+    private String email;
+}
+
+2)You create a Spring Data repository:
+@RepositoryRestResource(path = "students")
+public interface StudentRepository extends JpaRepository<Student, Long> {
+    List<Student> findByName(@Param("name") String name);
+}
+
+
+3)
+Spring Data REST exposes endpoints like:
+
+GET /students
+
+POST /students
+
+GET /students/{id}
+
+DELETE /students/{id}
+
+GET /students/search/findByName?name=John
+
+
+
+
+
+Feature	                        Benefit
+Auto CRUD endpoints	            No need to write boilerplate controller code
+Pagination & sorting	            Built-in via query params like ?page=0&size=10&sort=name
+Custom queries	                  Exposed via /search endpoints
+HAL browser	                        Visual API explorer at /browser or /profile
+HATEOAS support	                  Hypermedia links for discoverability
+Easy integration	                  Works with Spring Boot out of the box
