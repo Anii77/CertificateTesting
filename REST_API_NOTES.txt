@@ -1,0 +1,112 @@
+Core REST Annotations:
+
+
+Annotation	Purpose	                                                      Example Usage
+@RestController	      Combines @Controller + @ResponseBody for REST APIs	@RestController public class Api {}
+@RequestMapping	      Maps HTTP requests to handler methods	            @RequestMapping("/users")
+@GetMapping	            Shortcut for @RequestMapping(method = GET)	      @GetMapping("/users")
+@PostMapping	      Shortcut for @RequestMapping(method = POST)	      @PostMapping("/users")
+@PutMapping	            Shortcut for @RequestMapping(method = PUT)	      @PutMapping("/users/{id}")
+@DeleteMapping	      Shortcut for @RequestMapping(method = DELETE)	      @DeleteMapping("/users/{id}")
+
+
+🧩 Parameter Binding Annotations:
+Annotation	      Purpose	                                                Example Usage
+@PathVariable	Binds URI path segments to method parameters	            @GetMapping("/users/{id}")
+@RequestParam	Binds query parameters	                                    @GetMapping("/search?q=aniket")
+@RequestBody	Binds request JSON to a Java object	                        @PostMapping with @RequestBody User u
+@ResponseBody	Serializes return value to JSON/XML	                        Often implicit in @RestController
+
+
+🧪 Bonus: Content Negotiation & Headers
+Annotation	      Purpose	                                              Example Usage
+@RequestHeader	Access HTTP headers	                                  @RequestHeader("User-Agent") String ua
+@ResponseStatus	Set custom HTTP status code	                            @ResponseStatus(HttpStatus.CREATED)
+@CrossOrigin	Enable CORS for specific endpoints	                      @CrossOrigin(origins = "*")
+
+What Is @RequestPart?
+It binds a specific part of a multipart request to a method argument.
+
+Unlike @RequestParam, which works well for simple form fields or files, @RequestPart is ideal for complex content like JSON or XML.
+
+@PostMapping(path = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+public ResponseEntity<String> upload(
+    @RequestPart("user") User user,              // JSON part
+    @RequestPart("file") MultipartFile file      // File part
+) {
+    // Process user and file
+    return ResponseEntity.ok("Uploaded successfully");
+}
+
+@RequestBody — Client ➡️ Server
+Purpose: Deserializes the incoming HTTP request body (usually JSON or XML) into a Java object.
+
+Used in: POST, PUT, PATCH methods where the client sends structured data.
+
+@PostMapping("/addUser")
+public ResponseEntity<String> addUser(@RequestBody User user) {
+    // 'user' is populated from JSON sent by client
+    return ResponseEntity.ok("User added");
+}
+
+
+
+@ResponseBody — Server ➡️ Client
+Purpose: Serializes the Java object returned by the method into JSON (or XML) and sends it in the HTTP response body.
+
+Used in: GET, POST, etc., when you want to return structured data to the client.
+
+@GetMapping("/getUser")
+@ResponseBody
+public User getUser() {
+    return new User("Aniket", "Java Developer");
+}
+
+
+
+Annotation	      Direction	      Role in Data Transfer	                  Typical Use Case
+@RequestBody	Client → Server	Converts request body to Java object	Form submissions, JSON payloads
+@ResponseBody	Server → Client	Converts Java object to response body	API responses, JSON output
+
+
+
+
+@RequestParam — For Query Parameters
+Extracts values from the query string (after ? in the URL)
+
+Ideal for optional filters, search terms, pagination, etc.
+@GetMapping("/search")
+public String search(@RequestParam("q") String query) {
+    return "Searching for: " + query;
+}
+Example URL: /search?q=laptop → query = "laptop"
+
+
+
+
+@PathVariable — For URL Path Segments
+Extracts values embedded directly in the URI path
+
+Ideal for identifying specific resources (like user ID, product ID)
+
+@GetMapping("/users/{id}")
+public String getUser(@PathVariable("id") Long userId) {
+    return "User ID: " + userId;
+}
+/users/42 → userId = 42
+
+
+
+
+Feature	       @RequestParam	                         @PathVariable
+Source	       Query string (?key=value)	             URI path (/resource/{value})
+Use case	       Filters, search, optional params	       Resource identification
+Optional support	 Easy with required=false or defaultValue	 Supported with required=false from Spring 4.3.3
+URL example	       /products?category=books	             /products/books
+
+
+
+@GetMapping("/users/{id}/orders")
+public String getOrders(@PathVariable Long id, @RequestParam String status) {
+    return "Orders for user " + id + " with status " + status;
+}
