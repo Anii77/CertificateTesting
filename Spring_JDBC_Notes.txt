@@ -1,0 +1,103 @@
+What is the purpose of the schema.sql file in a Spring Boot project?
+To define the database structure in H2 Database.
+
+
+What is the primary purpose of the data.sql file?
+To insert initial data into tables in H2 Database.
+
+Which method in JdbcTemplate is used to execute a SELECT query?
+query()
+
+Row Mapper
+In Spring, a RowMapper is a powerful interface used with JdbcTemplate 
+to map rows of a ResultSet to Java objects—perfect for clean, 
+object-oriented database access without boilerplate code.
+
+It’s a callback interface with a single method:
+T mapRow(ResultSet rs, int rowNum) throws SQLException;
+
+Spring calls this method for each row in the result set.
+
+You return a fully populated object for each row—Spring collects them into a list.
+
+
+
+
+
+public class Employee {
+    private int id;
+    private String name;
+    private double salary;
+    // Getters, setters, constructors
+}
+
+
+public class EmployeeRowMapper implements RowMapper<Employee> {
+    @Override
+    public Employee mapRow(ResultSet rs, int rowNum) throws SQLException {
+        return new Employee(
+            rs.getInt("id"),
+            rs.getString("name"),
+            rs.getDouble("salary")
+        );
+    }
+}
+
+List<Employee> employees = jdbcTemplate.query(
+    "SELECT * FROM employee",
+    new EmployeeRowMapper()
+);
+
+
+
+-------------------------------------------------------------------------------------------------------------------
+
+
+
+H2 is a lightweight, fast, in-memory SQL database written in Java—perfect for development, 
+testing, and small-scale applications. 
+It’s especially popular in Spring Boot projects because of how seamlessly it integrates.
+
+To use H2 in a Spring Boot app:
+Add dependencies in pom.xml:
+<dependency>
+  <groupId>com.h2database</groupId>
+  <artifactId>h2</artifactId>
+  <scope>runtime</scope>
+</dependency>
+
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.h2.console.enabled=true
+--------------------------------------------------------------------------------------------------------------------
+
+What Is JdbcTemplate?
+It’s a core class in Spring JDBC that:
+
+Manages connections and exceptions for you
+
+Executes SQL queries, updates, and stored procedures
+
+Works seamlessly with RowMapper.
+
+Why Use It?
+Reduces boilerplate: No need to manually manage Connection, Statement, or ResultSet
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
